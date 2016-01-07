@@ -136,7 +136,6 @@ function minionHitTramp(minion, trampoline) {
 function enemyHitBanana(enemy, banana) {
   banana.kill();
   enemyScore += 422;
-  scoreText.setText('Potassium: '+ minionScore + 'mg ' + enemyScore);
   if ((enemyScore + minionScore) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
     alertMessage();
     location.reload();
