@@ -52,6 +52,11 @@ function create() {
   trampoline.body.immovable = true;
   game.physics.arcade.checkCollision.down = false;
 
+  enemy1 = game.add.sprite(-100, 40, 'enemy1');
+  game.physics.enable(enemy1, Phaser.Physics.ARCADE);
+  enemy1.body.immovable = true;
+  game.time.events.add(Phaser.Timer.SECOND * 20, enemyEntersAgain, this);
+
   minion = game.add.sprite(game.world.width * 0.5, game.world.height - 100, 'minion');
   minion.anchor.set(0.5);
   game.physics.enable(minion, Phaser.Physics.ARCADE);
@@ -59,11 +64,6 @@ function create() {
   minion.body.bounce.set(1);
   minion.checkWorldBounds = true;
   minion.events.onOutOfBounds.add(ballLeaveScreen, this);
-
-  enemy1 = game.add.sprite(-100, 40, 'enemy1');
-  game.physics.enable(enemy1, Phaser.Physics.ARCADE);
-  enemy1.body.immovable = true;
-  game.time.events.add(Phaser.Timer.SECOND * 20, enemyEntersAgain, this);
 
   textStyle = { font: '14px Arial', fill: '#0095DD' };
   scoreText = game.add.text(game.world.width - 200, 5, 'Potassium: 0mg', textStyle);
@@ -80,8 +80,8 @@ function update() {
   game.physics.arcade.collide(minion, bananas, minionHitBanana);
   game.physics.arcade.overlap(enemy1, bananas, enemyHitBanana, null, this);
   game.physics.arcade.overlap(enemy2, bananas, enemyHitBanana, null, this);
-  game.physics.arcade.collide(minion, enemy1, minionHitEnemy);
-  game.physics.arcade.collide(minion, enemy2, minionHitEnemy);
+  // game.physics.arcade.collide(minion, enemy1, minionHitEnemy);
+  // game.physics.arcade.collide(minion, enemy2, minionHitEnemy);
   if (playing) {
     trampoline.x = game.input.x || game.world.width * 0.5;
   }
