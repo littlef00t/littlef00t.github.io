@@ -22,7 +22,7 @@ var alertMessage = function () {
     } else if (minionScore >= 5064) {
       alert("Kevin has enough Potassium to conquer one of the purple minions and run away from the other!")
     } else if (minionScore >= 2954) {
-      alert("Kevin has enough energy to run away from the purple minions but not enough to conquer them")
+      alert("Kevin has enough Potassium to run away from the purple minions but not enough to conquer them")
     } else {
       alert("Kevin did not have enough Potassium to run away from the purple minions. He now lives in their captivity...")
     }
