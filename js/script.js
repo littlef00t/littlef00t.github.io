@@ -1,7 +1,7 @@
-var game = new Phaser.Game(2400, 1800, Phaser.AUTO, null, {
+var game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
   preload: preload, create: create, update: update
 });
-var carrot;
+var minion;
 var trampoline;
 var bananas;
 var newBanana;
@@ -11,27 +11,23 @@ var score = 0;
 var lives = 5;
 var livesText;
 var lifeLostText;
+var playing = false;
+var startButton;
 
 function preload() {
   game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
   game.scale.pageAlignHorizontally = true;
   game.scale.pageAlignVertically = true;
-  game.stage.backgroundColor = "FFFFFF";
-  game.load.image('carrot', 'img/minion.png');
+  game.stage.backgroundColor = "CFFCFF";
   game.load.image('trampoline', 'img/trampoline.png');
-  game.load.image('banana', 'img/banana.png');
+  game.load.image('minion', 'img/smallminion.png');
+  game.load.image('banana', 'img/smallbanana.png');
+  game.load.spritesheet('button', 'img/button.png', 120, 40);
 }
 function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
+
   initBananas();
-  carrot = game.add.sprite(game.world.width * 0.5, game.world.height - 25, 'carrot');
-  carrot.anchor.set(0.5);
-  game.physics.enable(carrot, Phaser.Physics.ARCADE);
-  carrot.body.velocity.set(400, -400);
-  carrot.body.collideWorldBounds = true;
-  carrot.body.bounce.set(1);
-  carrot.checkWorldBounds = true;
-  carrot.events.onOutOfBounds.add(ballLeaveScreen, this);
 
   trampoline = game.add.sprite(game.world.width / 2, game.world.height - 5, 'trampoline');
   trampoline.anchor.set(0.5, 1);
@@ -39,19 +35,33 @@ function create() {
   trampoline.body.immovable = true;
   game.physics.arcade.checkCollision.down = false;
 
-  textStyle = { font: '36px Arial', fill: '#0095DD' };
-  scoreText = game.add.text(2000, 5, 'Potassium: 0mg', textStyle);
-  livesText = game.add.text(5, 5, 'Lives left: 5', textStyle);
+  minion = game.add.sprite(game.world.width * 0.5, game.world.height - 100, 'minion');
+  minion.anchor.set(0.5);
+  game.physics.enable(minion, Phaser.Physics.ARCADE);
+  // minion.body.velocity.set(400, -400);
+  minion.body.collideWorldBounds = true;
+  minion.body.bounce.set(1);
+  minion.checkWorldBounds = true;
+  minion.events.onOutOfBounds.add(ballLeaveScreen, this);
+
+  textStyle = { font: '14px Arial', fill: '#0095DD' };
+  scoreText = game.add.text(game.world.width - 200, 5, 'Potassium: 0mg', textStyle);
+  livesText = game.add.text(10, 5, 'Lives left: 5', textStyle);
   lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, 'Life lost, click to continue', textStyle);
   lifeLostText.anchor.set(0.5);
   lifeLostText.visible = false;
+
+  startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
+  startButton.anchor.set(0.5);
 }
 function update() {
-  game.physics.arcade.collide(carrot, trampoline);
-  game.physics.arcade.collide(carrot, bananas, minionHitBanana);
-  trampoline.x = game.input.x || game.world.width * 0.5;
-  // carrot.x += 1;
-  // carrot.y += 1;
+  game.physics.arcade.collide(minion, trampoline);
+  game.physics.arcade.collide(minion, bananas, minionHitBanana);
+  if (playing) {
+    trampoline.x = game.input.x || game.world.width * 0.5;
+  }
+  // minion.x += 1;
+  // minion.y += 1;
 }
 
 function initBananas() {
@@ -63,12 +73,12 @@ function initBananas() {
       col: 2
     },
     offset: {
-      top: 200,
+      top: 100,
       left: 100
     },
     padding: {
-      vertical: 250,
-      horiz: 300
+      vertical: 15,
+      horiz: 40
     }
   }
 
@@ -87,7 +97,7 @@ function initBananas() {
 
 }
 
-function minionHitBanana(carrot, banana) {
+function minionHitBanana(minion, banana) {
   banana.kill();
   score += 422;
   scoreText.setText('Potassium: '+ score + 'mg');
@@ -102,15 +112,21 @@ function ballLeaveScreen() {
   if (lives) {
     livesText.setText('Lives: ' + lives);
     lifeLostText.visible = true;
-    carrot.reset(game.world.width * 0.5, game.world.height - 25);
+    minion.reset(game.world.width * 0.5, game.world.height - 25);
     trampoline.reset(game.world.width * 0.5, game.world.height - 5);
     game.input.onDown.addOnce(function () {
       lifeLostText.visible = false;
-      carrot.body.velocity.set(400, -400);
+      minion.body.velocity.set(400, -400);
     }, this);
   }
   else {
     alert('Keving died from malnutrition...hope you are proud of yourself');
     location.reload();
   }
+}
+
+function startGame() {
+  startButton.destroy();
+  minion.body.velocity.set(200, -200);
+  playing = true;
 }
