@@ -55,7 +55,7 @@ function create() {
   startButton.anchor.set(0.5);
 }
 function update() {
-  game.physics.arcade.collide(minion, trampoline);
+  game.physics.arcade.collide(minion, trampoline, minionHitTramp);
   game.physics.arcade.collide(minion, bananas, minionHitBanana);
   if (playing) {
     trampoline.x = game.input.x || game.world.width * 0.5;
@@ -107,6 +107,10 @@ function minionHitBanana(minion, banana) {
   }
 }
 
+function minionHitTramp(minion, paddle) {
+    minion.body.velocity.x = -1 * 10 * (paddle.x - minion.x);
+}
+
 function ballLeaveScreen() {
   lives -= 1;
   if (lives) {
@@ -116,7 +120,7 @@ function ballLeaveScreen() {
     trampoline.reset(game.world.width * 0.5, game.world.height - 5);
     game.input.onDown.addOnce(function () {
       lifeLostText.visible = false;
-      minion.body.velocity.set(400, -400);
+      minion.body.velocity.set(150, -150);
     }, this);
   }
   else {
@@ -127,6 +131,6 @@ function ballLeaveScreen() {
 
 function startGame() {
   startButton.destroy();
-  minion.body.velocity.set(200, -200);
+  minion.body.velocity.set(150, -150);
   playing = true;
 }
