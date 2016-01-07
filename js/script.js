@@ -108,7 +108,7 @@ function minionHitBanana(minion, banana) {
 }
 
 function minionHitTramp(minion, paddle) {
-    minion.body.velocity.x = -1 * 10 * (paddle.x - minion.x);
+    minion.body.velocity.x = -1 * 5 * (paddle.x - minion.x);
 }
 
 function ballLeaveScreen() {
