@@ -4,11 +4,13 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
 var minion;
 var enemy1;
 var enemy2;
+var enemyCount = 2;
 var trampoline;
 var bananas;
 var newBanana;
 var bananaInfo;
 var scoreText;
+var potassium = 0;
 var minionScore = 0;
 var enemyScore = 0;
 var lives = 3;
@@ -16,16 +18,19 @@ var livesText;
 var lifeLostText;
 var playing = false;
 var startButton;
+var level = 1;
+var levelText;
+var levelUpText;
 var alertMessage = function () {
-    if (minionScore === 5908) {
-      alert("Gold star! Kevin has enough Potassium to conquer the purple minions!");
-    } else if (minionScore >= 5064) {
-      alert("Silver star! Kevin has enough Potassium to conquer one of the purple minions and run away from the other!")
-    } else if (minionScore >= 2954) {
-      alert("Bronze star! Kevin has enough Potassium to run away from the purple minions but not enough to conquer them")
+  // console.error('blarg');
+    if (enemyCount === 0) {
+      alert("Congratulations! Kevin defeated both purple minions!");
+    } else if (enemyCount === 1) {
+      alert("Good job! Kevin defeated one purple minion!")
     } else {
-      alert("Kevin did not have enough Potassium to run away from the purple minions. He now lives in their captivity...")
+      alert("Kevin may not have defeated any purple minions, but he got to eat some bananas.")
     }
+    location.reload();
 }
 
 function preload() {
@@ -39,8 +44,8 @@ function preload() {
   game.load.spritesheet('button', 'img/button.png', 120, 40);
   game.load.image('enemy1', 'img/purpleminion.png');
   game.load.image('enemy2', 'img/purpleminion.png');
-
 }
+
 function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -55,7 +60,7 @@ function create() {
   enemy1 = game.add.sprite(-100, 40, 'enemy1');
   game.physics.enable(enemy1, Phaser.Physics.ARCADE);
   enemy1.body.immovable = true;
-  game.time.events.add(Phaser.Timer.SECOND * 20, enemyEntersAgain, this);
+  enemy1.events.onOutOfBounds.add(endGame, this)
 
   minion = game.add.sprite(game.world.width * 0.5, game.world.height - 100, 'minion');
   minion.anchor.set(0.5);
@@ -63,25 +68,30 @@ function create() {
   minion.body.collideWorldBounds = true;
   minion.body.bounce.set(1);
   minion.checkWorldBounds = true;
-  minion.events.onOutOfBounds.add(ballLeaveScreen, this);
+  minion.events.onOutOfBounds.add(minionLeaveScreen, this);
 
   textStyle = { font: '14px Arial', fill: '#0095DD' };
   scoreText = game.add.text(game.world.width - 200, 5, 'Potassium: 0mg', textStyle);
-  livesText = game.add.text(10, 5, 'Power surges left: 3', textStyle);
+  // livesText = game.add.text(10, 5, 'Power surges left: 3', textStyle);
   lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, 'Kevin is losing strength, click to continue', textStyle);
   lifeLostText.anchor.set(0.5);
   lifeLostText.visible = false;
 
+  levelUpText = game.add.text(game.world.width * 0.3, game.world.height * 0.5, 'Congratulations! On to the advanced level! Click to begin...', textStyle);
+  levelUpText.visible = false;
+  levelText = game.add.text(10, 5, 'Level: 1', textStyle);
+
   startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
   startButton.anchor.set(0.5);
 }
+
 function update() {
   game.physics.arcade.collide(minion, trampoline, minionHitTramp);
   game.physics.arcade.collide(minion, bananas, minionHitBanana);
   game.physics.arcade.overlap(enemy1, bananas, enemyHitBanana, null, this);
   game.physics.arcade.overlap(enemy2, bananas, enemyHitBanana, null, this);
-  // game.physics.arcade.collide(minion, enemy1, minionHitEnemy);
-  // game.physics.arcade.collide(minion, enemy2, minionHitEnemy);
+  game.physics.arcade.collide(minion, enemy1, minionHitEnemy);
+  game.physics.arcade.collide(minion, enemy2, minionHitEnemy);
   if (playing) {
     trampoline.x = game.input.x || game.world.width * 0.5;
   }
@@ -119,13 +129,24 @@ function initBananas() {
   }
 }
 
+function endGame() {
+  alertMessage();
+  location.reload();
+}
+
 function minionHitBanana(minion, banana) {
-  banana.kill();
+  banana.destroy();
+  potassium += 422;
   minionScore += 422;
   scoreText.setText('Potassium: '+ minionScore + 'mg ');
-  if ((enemyScore + minionScore) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
-    alertMessage();
-    location.reload();
+  if ((enemyScore + potassium) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
+    setTimeout(function(){
+      if (level === 1) {
+        levelUp();
+      } else {
+        endGame();
+      }
+    }, 100);
   }
 }
 
@@ -134,11 +155,10 @@ function minionHitTramp(minion, trampoline) {
 }
 
 function enemyHitBanana(enemy, banana) {
-  banana.kill();
+  banana.destroy();
   enemyScore += 422;
-  if ((enemyScore + minionScore) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
-    alertMessage();
-    location.reload();
+  if ((enemyScore + potassium) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
+    setTimeout(function(){ endGame(); }, 100);
   }
 }
 
@@ -150,32 +170,68 @@ function enemyEntersAgain() {
 }
 
 function minionHitEnemy(minion, enemy) {
-  minion.body.velocity.set(0, 700)
-}
-
-function ballLeaveScreen() {
-  lives -= 1;
-  if (lives) {
-    livesText.setText('Power surges: ' + lives);
-    lifeLostText.visible = true;
-    trampoline.reset(game.world.width * 0.5, game.world.height - 5);
-    minion.reset(game.world.width * 0.5, game.world.height - 100);
-    enemy1.reset(-100, 40);
-    game.input.onDown.addOnce(function () {
-      lifeLostText.visible = false;
-      minion.body.velocity.set(150, -150);
-      enemy1.body.velocity.set(25, 0)
-    }, this);
-  }
-  else {
-    alert('Kevin has no more energy to live another day...RIP');
+  if (minionScore >= 1688) {
+    enemy.kill();
+    minionScore -= 1688;
+    enemyCount -= 1;
+    scoreText.setText('Potassium: '+ minionScore + 'mg ')
+  } else {
+    minion.kill();
+    alert('Kevin the Minion did not have enough Potassium. He was conquered by the purple minion.')
     location.reload();
   }
+}
+function levelUp() {
+  level += 1;
+  levelUpText.visible = true;
+  trampoline.reset(game.world.width * 0.5, game.world.height - 5);
+  minion.reset(game.world.width * 0.5, game.world.height - 100);
+  initBananas();
+  enemy1.reset(-100, 40);
+  levelText.setText('Level: ' + level);
+  minionScore = 0;
+  potassium = 0;
+  scoreText.setText('Potassium: '+ minionScore + 'mg ');
+  game.input.onDown.addOnce(function () {
+    minion.body.velocity.set(150, -150);
+    enemy1.body.velocity.set(25, 0);
+    game.time.events.add(Phaser.Timer.SECOND * 10, enemyEntersAgain, this);
+    levelUpText.visible = false;
+  }, this);
+}
+
+function minionLeaveScreen() {
+  alert('Kevin the Minion fell to his death...RIP little minion');
+  location.reload();
+  // lives -= 1;
+  // if (lives) {
+  //   livesText.setText('Power surges: ' + lives);
+  //   lifeLostText.visible = true;
+  //   trampoline.reset(game.world.width * 0.5, game.world.height - 5);
+  //   minion.reset(game.world.width * 0.5, game.world.height - 100);
+  //   enemy1.reset(-100, 40);
+  //   game.input.onDown.addOnce(function () {
+  //     lifeLostText.visible = false;
+  //     minion.body.velocity.set(150, -150);
+  //     enemy1.body.velocity.set(25, 0)
+  //   }, this);
+  // }
+  // else {
+  //   alert('Kevin has no more energy to live another day...RIP');
+  //   location.reload();
+  // }
 }
 
 function startGame() {
   startButton.destroy();
   minion.body.velocity.set(150, -150);
-  enemy1.body.velocity.set(25, 0);
   playing = true;
+  if (level === 2) {
+    enemy1.body.velocity.set(25, 0);
+    game.time.events.add(Phaser.Timer.SECOND * 10, enemyEntersAgain, this);
+  }
 }
+
+// function endGame() {
+//   alert('cool it worked!')
+// }
