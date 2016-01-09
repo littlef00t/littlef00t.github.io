@@ -6,6 +6,6 @@
   * If he falls through, he dies. May he rest in peace.
 
 * Level 2
-  * Help Kevin the Minion get as many bananas as he can and conquer the purple minions!
+  * Help Kevin the Minion defeat the purple minions before all the bananas are gone!
   * 4 bananas gives Kevin the Minion enough Potassium to defeat one purple minion.
-  * Beware: if Kevin the Minion collides with a purple minion and does not have enough Potassium in him, he gets conquered.
+  * Beware: if Kevin the Minion collides with a purple minion and does not have enough Potassium in him, he gets defeated.

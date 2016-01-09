@@ -26,7 +26,7 @@ var alertMessage = function () {
     if (enemyCount === 0) {
       alert("Congratulations! Kevin defeated both purple minions!");
     } else if (enemyCount === 1) {
-      alert("Good job! Kevin defeated one purple minion!")
+      alert("Good job! Kevin defeated one purple minion before all the bananas got eaten!")
     } else {
       alert("Kevin may not have defeated any purple minions, but he got to eat some bananas.")
     }
@@ -73,13 +73,13 @@ function create() {
   textStyle = { font: '14px Arial', fill: '#0095DD' };
   scoreText = game.add.text(game.world.width - 200, 5, 'Potassium: 0mg', textStyle);
   // livesText = game.add.text(10, 5, 'Power surges left: 3', textStyle);
-  lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, 'Kevin is losing strength, click to continue', textStyle);
-  lifeLostText.anchor.set(0.5);
-  lifeLostText.visible = false;
+  // lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, 'Kevin is losing strength, click to continue', textStyle);
+  // lifeLostText.anchor.set(0.5);
+  // lifeLostText.visible = false;
 
   levelUpText = game.add.text(game.world.width * 0.3, game.world.height * 0.5, 'Congratulations! On to the advanced level! Click to begin...', textStyle);
   levelUpText.visible = false;
-  levelText = game.add.text(10, 5, 'Level: 1', textStyle);
+  levelText = game.add.text(10, 5, 'Level: 1 of 2', textStyle);
 
   startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
   startButton.anchor.set(0.5);
@@ -146,7 +146,7 @@ function minionHitBanana(minion, banana) {
       } else {
         endGame();
       }
-    }, 100);
+    }, 300);
   }
 }
 
@@ -158,7 +158,7 @@ function enemyHitBanana(enemy, banana) {
   banana.destroy();
   enemyScore += 422;
   if ((enemyScore + potassium) === (bananaInfo.count.row * bananaInfo.count.col * 422 )) {
-    setTimeout(function(){ endGame(); }, 100);
+    setTimeout(function(){ endGame(); }, 300);
   }
 }
 
@@ -175,9 +175,12 @@ function minionHitEnemy(minion, enemy) {
     minionScore -= 1688;
     enemyCount -= 1;
     scoreText.setText('Potassium: '+ minionScore + 'mg ')
+    if (enemyCount === 0) {
+      endGame();
+    }
   } else {
     minion.kill();
-    alert('Kevin the Minion did not have enough Potassium. He was conquered by the purple minion.')
+    alert('Kevin the Minion needs 1688 mg of Potassium (4 bananas) to defeat the purple minion. He did not have enough to win the fight.')
     location.reload();
   }
 }
@@ -188,7 +191,7 @@ function levelUp() {
   minion.reset(game.world.width * 0.5, game.world.height - 100);
   initBananas();
   enemy1.reset(-100, 40);
-  levelText.setText('Level: ' + level);
+  levelText.setText('Level: ' + level + ' of 2');
   minionScore = 0;
   potassium = 0;
   scoreText.setText('Potassium: '+ minionScore + 'mg ');
@@ -226,10 +229,10 @@ function startGame() {
   startButton.destroy();
   minion.body.velocity.set(150, -150);
   playing = true;
-  if (level === 2) {
-    enemy1.body.velocity.set(25, 0);
-    game.time.events.add(Phaser.Timer.SECOND * 10, enemyEntersAgain, this);
-  }
+  // if (level === 2) {
+  //   enemy1.body.velocity.set(25, 0);
+  //   game.time.events.add(Phaser.Timer.SECOND * 10, enemyEntersAgain, this);
+  // }
 }
 
 // function endGame() {
