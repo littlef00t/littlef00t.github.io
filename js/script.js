@@ -21,8 +21,9 @@ var startButton;
 var level = 1;
 var levelText;
 var levelUpText;
-var directionsText1;
-var directionsText2;
+var dirText1;
+var dirText2Line1;
+var dirText2Line2;
 var alertMessage = function () {
   // console.error('blarg');
     if (enemyCount === 0) {
@@ -79,14 +80,20 @@ function create() {
   // lifeLostText.anchor.set(0.5);
   // lifeLostText.visible = false;
 
-  levelUpText = game.add.text(game.world.width * 0.3, game.world.height * 0.5, 'Congratulations! On to the advanced level! Click to begin...', textStyle);
+  levelUpText = game.add.text(game.world.width * 0.185, game.world.height * 0.5, 'Congratulations! On to level 2! Read the directions below then click to begin...', textStyle);
   levelUpText.visible = false;
   levelText = game.add.text(10, 5, 'Level: 1 of 2', textStyle);
 
   startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
   startButton.anchor.set(0.5);
 
-  directionsText1 = game.add.text(game.world.width * 0.2, game.world.height * 0.6, 'Catch Kevin the Minion with the trampoline and collect all the bananas!', textStyle);
+  dirText1 = game.add.text(game.world.width * 0.25, game.world.height * 0.6, 'Catch Kevin the Minion with the trampoline and collect all the bananas!', textStyle);
+
+  dirText2Line1 = game.add.text(game.world.width * 0.17, game.world.height * 0.6, 'Help Kevin the Minion defeat the purple minions before all the bananas are collected.', textStyle);
+  dirText2Line2 = game.add.text(game.world.width * 0.2, game.world.height * 0.65, '4 bananas(1688 mg of Potassium) are needed to conquer one purple minion.', textStyle);
+  dirText2Line1.visible = false;
+  dirText2Line2.visible = false;
+
 }
 
 function update() {
@@ -191,6 +198,8 @@ function minionHitEnemy(minion, enemy) {
 function levelUp() {
   level += 1;
   levelUpText.visible = true;
+  dirText2Line1.visible = true;
+  dirText2Line2.visible = true;
   trampoline.reset(game.world.width * 0.5, game.world.height - 5);
   minion.reset(game.world.width * 0.5, game.world.height - 100);
   initBananas();
@@ -204,6 +213,8 @@ function levelUp() {
     enemy1.body.velocity.set(25, 0);
     game.time.events.add(Phaser.Timer.SECOND * 10, enemyEntersAgain, this);
     levelUpText.visible = false;
+    dirText2Line1.visible = false;
+    dirText2Line2.visible = false;
   }, this);
 }
 
@@ -232,7 +243,7 @@ function minionLeaveScreen() {
 function startGame() {
   startButton.destroy();
   minion.body.velocity.set(150, -150);
-  directionsText1.visible = false;
+  dirText1.visible = false;
   playing = true;
   // if (level === 2) {
   //   enemy1.body.velocity.set(25, 0);
