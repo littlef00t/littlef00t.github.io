@@ -21,6 +21,8 @@ var startButton;
 var level = 1;
 var levelText;
 var levelUpText;
+var directionsText1;
+var directionsText2;
 var alertMessage = function () {
   // console.error('blarg');
     if (enemyCount === 0) {
@@ -83,6 +85,8 @@ function create() {
 
   startButton = game.add.button(game.world.width * 0.5, game.world.height * 0.5, 'button', startGame, this, 1, 0, 2);
   startButton.anchor.set(0.5);
+
+  directionsText1 = game.add.text(game.world.width * 0.2, game.world.height * 0.6, 'Catch Kevin the Minion with the trampoline and collect all the bananas!', textStyle);
 }
 
 function update() {
@@ -228,6 +232,7 @@ function minionLeaveScreen() {
 function startGame() {
   startButton.destroy();
   minion.body.velocity.set(150, -150);
+  directionsText1.visible = false;
   playing = true;
   // if (level === 2) {
   //   enemy1.body.velocity.set(25, 0);
